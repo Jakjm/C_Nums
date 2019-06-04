@@ -1,4 +1,4 @@
 CC=gcc
 
-run: bigints.c 
-	$(CC) -o run bigints.c -lm
+run: bigint.c 
+	$(CC) -o run bigint.c -lm
