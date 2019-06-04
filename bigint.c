@@ -2,22 +2,22 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
 /**
  * Working on a bigint and bignumber personal project. 
- * @version May 21st 2019
+ * @version May 31st 2019
  * @author Jakjm - me
  */
 
-
 //Bignum structure
-typedef struct Bignum{
-	short wholeSize;
-	unsigned char *whole;
-	char sign;
-} Bignum;
+typedef struct BigInt{
+	short wholeSize; //The length of the unsigned char array.
+	unsigned char *whole; //The address of the first unsigned char for the bignum. 
+	char sign; //The sign of the bigint.
+} BigInt;
 
-//Verifies that a string is of a numeric format.
-int checkBignum(char *str){
+//Verifies that a string is of a base 10 big integer format.
+int checkBigInt(char *str){
 	if(*str == '-' || *str == '+'){
 		++str;
 	}
@@ -30,14 +30,14 @@ int checkBignum(char *str){
 	return 1;
 }
 char *processNumber(char *);
-void mulBignum10(Bignum *);
-//Parses a bignum from a given string. 
-Bignum *parseBignum(char *str){
-	if(!checkBignum(str)){
+void mulBigInt10(BigInt *);
+//Parses a big integer from a given string. 
+BigInt *parseBigInt(char *str){
+	if(!checkBigInt(str)){
 		return NULL;
 	}
 	else{
-		Bignum *newNum = malloc(sizeof(Bignum));
+		BigInt *newNum = malloc(sizeof(BigInt));
 		int sum, currentBlock;
 		str = processNumber(str);
 
@@ -76,7 +76,7 @@ Bignum *parseBignum(char *str){
 		//Loading digits into the bignum, converting the string into a 
 		//Base 256 number. 
 		while(*str != '\0'){
-			mulBignum10(newNum);
+			mulBigInt10(newNum);
 			current = *str - '0';
 
 
@@ -95,7 +95,67 @@ Bignum *parseBignum(char *str){
 
 	}
 }
-void divBignum10(Bignum *num){
+
+BigInt *difBigInts(BigInt *,BigInt *);
+//Calculates the sum of two big integers.
+BigInt *sumBigInts(BigInt *num1,BigInt *num2){
+	if(num1->sign != num2 -> sign){
+		BigInt *result, *minuend, *subtrahend;
+
+		//Minuend becomes the non-negative number. 
+		//Subtrahend becomes the negative one. 
+		if(num1->sign == 1){
+			minuend = num2;
+			subtrahend = num1;
+		}
+		else{
+			minuend = num1;
+			subtrahend = num2;
+		}
+		subtrahend->sign == 0;
+		result = difBigInts(minuend,subtrahend);
+		subtrahend->sign == 1;
+		return result;
+	}
+	
+	int sum, carry, index;
+	BigInt *smaller,*larger;
+	if(num1->wholeSize > num2->wholeSize){
+		larger = num1;
+		smaller = num2;	
+	}
+	else{
+		larger = num2;
+		smaller = num1;
+	}
+	carry = 0;
+	unsigned char *sumValue = malloc(sizeof(unsigned char) * (larger->wholeSize + 1));
+	for(index = 0;index < smaller->wholeSize;++index){
+		sum = larger->whole[index] + smaller->whole[index] + carry;
+		sumValue[index] = sum % 256; 
+		carry = sum / 256;
+	}
+	while(index < larger->wholeSize){
+		sum = larger->whole[index] + carry;
+		sumValue[index] = sum % 256;
+		carry = sum / 256;
+		++index;
+	}
+	if(carry == 1){
+		sumValue[index] = 1;
+	}
+	BigInt *newInt = malloc(sizeof(BigInt));
+	newInt->sign = larger->sign;
+	newInt->whole = sumValue;
+	newInt->wholeSize = larger->wholeSize + 1;
+	return newInt;
+}
+//Calculates the difference of two big integers. 
+BigInt *difBigInts(BigInt *num1,BigInt *num2){
+	return NULL;
+}
+//Divides the bigint by 10. 
+void divBigInt10(BigInt *num){
 	int index, carry, sum; 
 	carry = 0; 
 	for(index = num->wholeSize - 1;index >= 0;--index){
@@ -104,7 +164,8 @@ void divBignum10(Bignum *num){
 		num->whole[index] = sum / 10;
 	}
 }
-void mulBignum10(Bignum *num){
+//Multiplies the big integer by 10
+void mulBigInt10(BigInt *num){
 	int index,carry,product;
 	carry = 0; 
 	for(index = 0;index < num->wholeSize;++index){
@@ -139,15 +200,8 @@ char *processNumber(char *str){
 	newString[currentIndex] = '\0';
 	return newString; 
 }
-void printBignumHex(Bignum *num){
-	int index;
-	putchar(num->sign == 0 ? '\0' : '-');
-	for(index = num->wholeSize;index >= 0;--index){
-		printf("%x",num->whole[index]);
-	}
-}
 void reverseStr(char *);
-int isZero(Bignum *num){
+int isZero(BigInt *num){
 	int index;
 	for(index = 0;index < num->wholeSize;++index){
 		if(num->whole[index] != 0)return 0;
@@ -155,9 +209,9 @@ int isZero(Bignum *num){
 	return 1;
 }
 //Creates a deep copy of a Bignum. 
-Bignum *copyBignum(Bignum *number){
+BigInt *copyBigInt(BigInt *number){
 	int index;
-	Bignum *copy = malloc(sizeof(Bignum));
+	BigInt *copy = malloc(sizeof(BigInt));
 	copy->sign = number->sign;
 	copy->wholeSize = number->wholeSize;
 	copy->whole = malloc(sizeof(unsigned char) * copy->wholeSize);
@@ -166,10 +220,18 @@ Bignum *copyBignum(Bignum *number){
 	}
 	return copy;
 }
-//In development. 
-void printBignum(Bignum *num){
+//Prints the biginteger as a hexadecimal string
+void printBigIntHex(BigInt *num){
+	int index;
+	putchar(num->sign == 0 ? '\0' : '-');
+	for(index = num->wholeSize;index >= 0;--index){
+		printf("%x\n",num->whole[index]);
+	}
+}
+//Prints a big int in decimal format.
+void printBigInt(BigInt *num){
 	int index, sum, count, strIndex, strSize;
-	//num = copyBignum(num);
+	num = copyBigInt(num);
 	strSize = (int)ceil((num->wholeSize * log(256)) / log(10));
 	strIndex = 0;
 	char *string = malloc(sizeof(char) * (strSize + 1));
@@ -181,7 +243,7 @@ void printBignum(Bignum *num){
 		sum *= 6;
 		sum += num->whole[0];
 		sum %= 10;
-		divBignum10(num);
+		divBigInt10(num);
 		string[strIndex] = sum + '0';
 		strIndex++;
 		if(isZero(num))break;
@@ -190,6 +252,7 @@ void printBignum(Bignum *num){
 	reverseStr(string);
 	printf("%c%s\n",num->sign == 0 ? '\0' : '-',string);
 }
+//Reverses a string
 void reverseStr(char *str){
 	int start = 0;
 	int end = 0;
@@ -209,19 +272,15 @@ void reverseStr(char *str){
 	}
 
 }
-void checkString(char *str,int expectation){
-	printf("Test: \"%s\" ~ %s Expected:%s\n",str,checkBignum(str) ? "Passed" : "Failed",expectation ? "Pass" : "Fail");
-}
-void testValidityTester(){
-	checkString("111222333",1);
-	checkString("-12-23-45",0);
-	checkString("-000000002",1);
-}
+//Test program for big integers.
 int main(int argc, char **argv)
 {
-	char *numStr = "-25923124124214214112312124";
-	Bignum *number = parseBignum(numStr);
-	printf("%s\n",numStr);
-	printBignum(number);
+	char *numStr = "-456456";
+	BigInt *number = parseBigInt(numStr);
+	numStr = "-123123";
+	BigInt *number2 = parseBigInt(numStr);
+	printBigInt(number);
+	printBigInt(number2);
+	printBigInt(sumBigInts(number,number2));
 	return 0;
 }
