@@ -234,17 +234,34 @@ void printBigIntHex(BigInt *num){
 	}
 	printf("\n");
 }
-//Prints a big int in decimal format.
-void printBigInt(BigInt *num){
-	int index, sum, count, strIndex, strSize;
+/*
+ *Generates a base 10 representation of the BigInt. 
+ *@param BigInt * - the address of the big integer. 
+ *@return str  - the base 10 representation of the BigInt, as a string. 
+ */
+char *bigIntToStr(BigInt *num){
+	int index, sum, count, strIndex, strSize, sign;
+	char *string;
+	//Creating a copy of the num so we can destroy it to generate the base 10 string. 
 	num = copyBigInt(num);
-	if(num->whole[num->wholeSize - 1] >> 7 == 1){
-		putchar('-');
-		flipNegative(num);
-	}	
-	strSize = (int)ceil((num->wholeSize * log(256)) / log(10));
+
+	//Calculating the length of string needed. 
+	strSize = (int)ceil((num->wholeSize * log(256)) / log(10)) + 1;
 	strIndex = 0;
-	char *string = malloc(sizeof(char) * (strSize + 1));
+
+	//Calculating the sign of the number
+	sign = num->whole[num->wholeSize - 1] >> 7;
+	if(sign){
+		//Flip around the number, allocate another character for the negative sign. 
+		flipNegative(num);
+		string = malloc(sizeof(char) * (strSize + 1));
+		*string = '-';
+		++strIndex;
+	}
+	else{
+		//Otherwise just use the space needed. 
+		string = malloc(sizeof(char) * strSize);
+	}
 	for(count = 0;count < strSize;++count){
 		sum = 0;
 		for(index = num->wholeSize - 1;index > 0;--index){
@@ -259,9 +276,13 @@ void printBigInt(BigInt *num){
 		if(isZero(num))break;
 	}
 	string[strIndex] = '\0';
-	reverseStr(string);
-	printf("%c%s\n",num->whole[num->wholeSize - 1] ==00 ? '\0' : '-',string);
+	reverseStr(string + sign);
 	free(num);
+	return string;
+}
+//Prints a big int in decimal format.
+void printBigInt(BigInt *num){
+	printf("%s\n",bigIntToStr(num));
 }
 //Reverses a string
 void reverseStr(char *str){

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "bigint.h"
 int main(int argc, char **argv){
-	BigInt *number = parseBigInt("-1000000");
+	BigInt *number = parseBigInt("-1002000");
 	BigInt *number2 = parseBigInt("1000000");
 	printBigInt(number);
 	printBigInt(number2);
