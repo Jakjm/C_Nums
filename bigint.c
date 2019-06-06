@@ -32,7 +32,6 @@ int checkBigInt(char *str){
 char *processNumber(char *);
 void flipNegative(BigInt *);
 void mulBigInt10(BigInt *);
-
 BigInt *sumBigInts(BigInt *num1,BigInt *num2){
 	BigInt *larger, *smaller, *newNum;
 	int sum, carry, index, sign;
@@ -62,6 +61,13 @@ BigInt *sumBigInts(BigInt *num1,BigInt *num2){
 		++index;
 	}
 	return newNum;
+}
+BigInt *difBigInts(BigInt *num1,BigInt *num2){
+	BigInt *new;
+	flipNegative(num2);
+	new = sumBigInts(num1,num2);
+	flipNegative(num2);
+	return new;
 }
 
 //Parses a big integer from a given string. 
