@@ -78,9 +78,9 @@ BigInt *parseBigInt(char *str){
 	else{
 		int sum, currentBlock, sign, current, stringLength, numSize;
 		int base = 256;
-		double baseLog, mult;
+		double baseLog, numberSize;
 
-
+		str = processNumber(str);
 		//Determining sign from the string.
 		if(*str == '-'){
 			sign = 1;
@@ -95,21 +95,15 @@ BigInt *parseBigInt(char *str){
 		}
 
 		//Skip to the next signifigant digit. 
-		while(*str == '0'){
+		while(*str == '0' && *(str+1) != '\0'){
 			++str;
 		}
-
 
 		//Calculating space needed for the bignum.
 		stringLength = strlen(str);
 		baseLog = log(base);
-		mult = (stringLength - 1) * log(10);
-		mult += log(*str - '0' + 1) + log(2);
-		numSize = (int)ceil(mult / baseLog);
-		str = processNumber(str);
-
-		
-		
+		numberSize = ceil((stringLength * log(10)  - log(2)) / log(256));	
+		numSize = (int)ceil(numberSize);
 
 		//Updating the new bignum
 		BigInt *newNum = malloc(sizeof(BigInt));
@@ -121,7 +115,6 @@ BigInt *parseBigInt(char *str){
 		while(*str != '\0'){
 			mulBigInt10(newNum);
 			current = *str - '0';
-
 
 			sum = newNum->whole[0] + current;
 			newNum->whole[0] = sum % base;
@@ -137,9 +130,7 @@ BigInt *parseBigInt(char *str){
 			flipNegative(newNum);
 		}
 		
-
 		return newNum;
-
 	}
 }
 void printSpecs(BigInt *num){
@@ -200,7 +191,7 @@ char *processNumber(char *str){
 	 	++str;
 	}
 
-	while(*str == '0'){
+	while(*str == '0' && *(str+1) != '\0'){
 		++str;
 	}
 
