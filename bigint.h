@@ -15,6 +15,7 @@ BigInt *sumBigInts(BigInt *,BigInt *);
 BigInt *difBigInts(BigInt *,BigInt *);
 //Function for calculating the product of two bigints. 
 BigInt *productBigInts(BigInt *,BigInt *);
+BigInt *copyBigInt(BigInt *);
 
 int lessThanBigInt(BigInt *,BigInt *);
 int greaterThanBigInt(BigInt *,BigInt *);

@@ -6,7 +6,7 @@
 
 /**
  * Working on a bigint and bignumber personal project. 
- * @version May 31st 2019
+ * @version June 23rd 2019
  * @author Jakjm - me
  */
 
@@ -51,22 +51,73 @@ BigInt *sumBigInts(BigInt *num1,BigInt *num2){
 	carry = 0;
 	for(index = 0;index < smaller->wholeSize;++index){
 		sum = larger->whole[index] + smaller->whole[index] + carry;
-		newNum->whole[index] = sum % 256;
-		carry = sum / 256; 
+		carry = sum >> 8;
+		newNum->whole[index] = sum - (carry << 8);
 	}
 	while(index < larger->wholeSize){
 		sum = larger->whole[index] + carry + sign * 255;
-		newNum->whole[index] = sum % 256;
-		carry = sum / 256;
+		carry = sum >> 8;
+		newNum->whole[index] = sum - (carry << 8);
 		++index;
 	}
 	return newNum;
 }
 BigInt *difBigInts(BigInt *num1,BigInt *num2){
 	BigInt *new;
+	num2 = copyBigInt(num2);
 	flipNegative(num2);
 	new = sumBigInts(num1,num2);
-	flipNegative(num2);
+	free(num2);
+	return new;
+}
+BigInt *allocBigInt(int);
+BigInt *productBigInts(BigInt *num1,BigInt *num2){
+	//Method variables. 
+	unsigned char signOne, signTwo; 
+	BigInt *new;
+	unsigned int indexOne, indexTwo, product, carry, index;
+	unsigned int *buf;
+	
+	signOne = num1->whole[num1->wholeSize - 1] >> 7;
+	signTwo = num2->whole[num2->wholeSize - 1] >> 7;
+	//If num1 is negative, make a positive copy in its place.
+	if(signOne){
+		num1 = copyBigInt(num1);
+		flipNegative(num1);
+	}
+	//If num2 is negative, make a positive copy in its place.
+	if(signTwo){
+		num2 = copyBigInt(num2);
+		flipNegative(num2);
+	}
+
+	new = allocBigInt(num1->wholeSize + num2->wholeSize);
+	buf = calloc(new->wholeSize,sizeof(unsigned int));
+	for(indexOne = 0;indexOne < num1->wholeSize;++indexOne){
+		for(indexTwo = 0;indexTwo < num2->wholeSize;++indexTwo){
+			product = num1->whole[indexOne] * num2->whole[indexTwo];
+			buf[indexOne + indexTwo] += product; 
+		}
+	}
+	carry = 0;
+	for(index = 0;index < new->wholeSize;++index){
+	 	buf[index] += carry;
+		carry = buf[index] >> 8; 
+		new->whole[index] = buf[index] - (carry << 8);
+	}
+
+	//Free any copies of num1 or num2, if they were created.
+	if(signOne){
+		free(num1);
+	}
+	if(signTwo){
+		free(num2);
+	}
+
+	//If only one of them was negative, the new number should be negative also. 
+	if(signOne ^ signTwo){
+		flipNegative(new);
+	}
 	return new;
 }
 
@@ -222,6 +273,12 @@ BigInt *copyBigInt(BigInt *number){
 		copy->whole[index] = number->whole[index];
 	}
 	return copy;
+}
+BigInt *allocBigInt(int space){
+	BigInt *new = malloc(sizeof(BigInt));
+	new->wholeSize = space;
+	new->whole = calloc(space,sizeof(unsigned char));
+	return new;	
 }
 //Prints the biginteger as a hexadecimal string
 void printBigIntHex(BigInt *num){
