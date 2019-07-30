@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include "bigint.h"
+BigInt *power(BigInt *,BigInt *);
 int main(int argc, char **argv){
-	BigInt *int2 = parseBigInt("0");
-	BigInt *int3 = parseBigInt("-1");
-	printf("%d\n", greaterThanBigInt(int2,int3));
+	printBigInt(powerBigInts(parseBigInt("69"),parseBigInt("69")));
 	return 0; 
 }

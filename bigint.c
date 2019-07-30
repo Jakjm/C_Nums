@@ -361,6 +361,26 @@ void reverseStr(char *str){
 	}
 
 }
+BigInt *powerBigInts(BigInt *num, BigInt *exp){
+	BigInt *freeAddr;
+	BigInt *numCopy = copyBigInt(num);
+	BigInt *product = copyBigInt(num);
+	BigInt *expCopy = copyBigInt(exp);
+	BigInt *one = parseBigInt("1");
+	while (greaterThanBigInt(expCopy, one)){
+		freeAddr = product;
+		product = productBigInts(product, numCopy);
+		free(freeAddr);
+
+		freeAddr = expCopy;
+		expCopy = difBigInts(expCopy, one);
+		free(freeAddr);
+	}
+	free(numCopy);
+	free(one);
+	free(expCopy);
+	return product;
+}
 int greaterThanBigInt(BigInt *num1,BigInt *num2){
 	int index;
 	int signOne, signTwo; 

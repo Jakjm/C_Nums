@@ -13,6 +13,8 @@ void printSpecs(BigInt *num);
 BigInt *sumBigInts(BigInt *,BigInt *);
 //Function for calculating the difference of two bigints. 
 BigInt *difBigInts(BigInt *,BigInt *);
+//Function for calculating the first big int raised to the second. 
+BigInt *powerBigInts(BigInt *,BigInt *);
 //Function for calculating the product of two bigints. 
 BigInt *productBigInts(BigInt *,BigInt *);
 BigInt *copyBigInt(BigInt *);
