@@ -1,4 +1,4 @@
-//Header file for the big Integer structyure. 
+//Header file for the big Integer structure. 
 typedef struct BigInt BigInt;
 
 //Function for parsing a bigint from a string. 
