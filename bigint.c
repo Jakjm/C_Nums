@@ -16,6 +16,12 @@ typedef struct BigInt{
 	unsigned char *whole; //The address of the first unsigned char for the bignum. 
 } BigInt;
 
+//Frees the bigint structure. 
+void freeBigInt(BigInt *b){
+	free(b->whole);
+	free(b);
+}
+
 //Verifies that a string is of a base 10 big integer format.
 int checkBigInt(char *str){
 	if(*str == '-' || *str == '+'){
@@ -67,7 +73,7 @@ BigInt *difBigInts(BigInt *num1,BigInt *num2){
 	num2 = copyBigInt(num2);
 	flipNegative(num2);
 	new = sumBigInts(num1,num2);
-	free(num2);
+	freeBigInt(num2);
 	return new;
 }
 BigInt *allocBigInt(int);
@@ -109,12 +115,14 @@ BigInt *productBigInts(BigInt *num1,BigInt *num2){
 		new->whole[index] = buf[index] - (carry << 8);
 	}
 
+	free(buf);
+
 	//Free any copies of num1 or num2, if they were created.
 	if(signOne){
-		free(num1);
+		freeBigInt(num1);
 	}
 	if(signTwo){
-		free(num2);
+		freeBigInt(num2);
 	}
 
 	//If only one of them was negative, the new number should be negative also. 
@@ -271,12 +279,13 @@ BigInt *copyBigInt(BigInt *number){
 	int index;
 	BigInt *copy = malloc(sizeof(BigInt));
 	copy->wholeSize = number->wholeSize;
-	copy->whole = malloc(sizeof(unsigned char) * copy->wholeSize);
+	copy->whole = calloc(sizeof(unsigned char),copy->wholeSize);
 	for(index = 0;index < copy->wholeSize;++index){
 		copy->whole[index] = number->whole[index];
 	}
 	return copy;
 }
+//Allocates a bigint with the requested size...
 BigInt *allocBigInt(int space){
 	BigInt *new = malloc(sizeof(BigInt));
 	new->wholeSize = space;
@@ -334,12 +343,14 @@ char *bigIntToStr(BigInt *num){
 	}
 	string[strIndex] = '\0';
 	reverseStr(string + sign);
-	free(num);
+	freeBigInt(num);
 	return string;
 }
 //Prints a big int in decimal format.
 void printBigInt(BigInt *num){
-	printf("%s\n",bigIntToStr(num));
+	char *str = bigIntToStr(num);
+	printf("%s\n",str);
+	free(str);
 }
 //Reverses a string
 void reverseStr(char *str){
@@ -360,26 +371,6 @@ void reverseStr(char *str){
 		--end;
 	}
 
-}
-BigInt *powerBigInts(BigInt *num, BigInt *exp){
-	BigInt *freeAddr;
-	BigInt *numCopy = copyBigInt(num);
-	BigInt *product = copyBigInt(num);
-	BigInt *expCopy = copyBigInt(exp);
-	BigInt *one = parseBigInt("1");
-	while (greaterThanBigInt(expCopy, one)){
-		freeAddr = product;
-		product = productBigInts(product, numCopy);
-		free(freeAddr);
-
-		freeAddr = expCopy;
-		expCopy = difBigInts(expCopy, one);
-		free(freeAddr);
-	}
-	free(numCopy);
-	free(one);
-	free(expCopy);
-	return product;
 }
 int greaterThanBigInt(BigInt *num1,BigInt *num2){
 	int index;

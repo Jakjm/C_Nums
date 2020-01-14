@@ -8,15 +8,15 @@ char *bigIntToStr(BigInt *);
 void printBigIntHex(BigInt *);
 int checkBigInt(char *);
 void printSpecs(BigInt *num);
-
+void freeBigInt(BigInt *);
 //Function for calculating the sum of two bigints.
 BigInt *sumBigInts(BigInt *,BigInt *);
 //Function for calculating the difference of two bigints. 
 BigInt *difBigInts(BigInt *,BigInt *);
-//Function for calculating the first big int raised to the second. 
-BigInt *powerBigInts(BigInt *,BigInt *);
 //Function for calculating the product of two bigints. 
 BigInt *productBigInts(BigInt *,BigInt *);
+//Function for calculating the value of the first bigint raised to the second. 
+BigInt *powerBigInts(BigInt *,BigInt *);
 BigInt *copyBigInt(BigInt *);
 
 int lessThanBigInt(BigInt *,BigInt *);
