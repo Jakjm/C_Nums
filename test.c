@@ -3,14 +3,18 @@
 #include <time.h>
 #include "bigint.h"
 int main(int argc, char **argv){
-	BigInt *big = parseBigInt("2");
-	BigInt *product = parseBigInt("1");
-	BigInt *tmp;
-	for(int i = 0;i < 500;++i){
-		tmp = product;
-		product = productBigInts(big,product);
-		freeBigInt(tmp);
+	BigInt *b;
+	BigInt *one = parseBigInt("1");
+	BigInt *result;
+	char *s = malloc(sizeof(char) * 20);
+	for(int i = 214;i >= -20;--i){
+		sprintf(s,"%d",i);
+		b = parseBigInt(s);
+		result = difBigInts(b,one);
+		printBigInt(result);
+		
+		freeBigInt(result);
+		freeBigInt(b);
 	}
-	printBigInt(product);
 	return 0;
 }

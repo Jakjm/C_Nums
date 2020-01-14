@@ -170,7 +170,7 @@ BigInt *parseBigInt(char *str){
 		//Updating the new bignum
 		BigInt *newNum = malloc(sizeof(BigInt));
 		newNum->wholeSize = numSize;
-		newNum->whole = malloc(sizeof(unsigned char) * numSize);
+		newNum->whole = calloc(sizeof(unsigned char),numSize);
 		
 		//Loading digits into the bignum, converting the string into a 
 		//Base 256 number. 
@@ -191,7 +191,6 @@ BigInt *parseBigInt(char *str){
 		if(sign){
 			flipNegative(newNum);
 		}
-		
 		return newNum;
 	}
 }
@@ -373,61 +372,26 @@ void reverseStr(char *str){
 
 }
 int greaterThanBigInt(BigInt *num1,BigInt *num2){
-	int index;
-	int signOne, signTwo; 
-	signOne = num1->whole[num1->wholeSize-1] >> 7;
-	signTwo = num2->whole[num2->wholeSize-1] >> 7;
-	if(signOne == 0){
-		if(signTwo == 1){
-			return 1;
-		}
-		//Case where both numbers are positive.
-		else{
-
-			//Deal with cases where one number has a bigger whole size than the other.
-			if(num1->wholeSize > num2->wholeSize){
-				index=num1->wholeSize - 1;
-				while(index > num2->wholeSize-1){
-					if(num1->whole[index] > 0){
-						return 1;
-					}
-					--index;
-				}
-			}
-			else{
-				index=num2->wholeSize - 1;
-				while(index > num2->wholeSize - 1){
-					if(num2->whole[index] > 0){
-						return 1;
-					}
-					--index;
-				}
-			}
-
-			while(index > 0){
-				if(num1->whole[index] > num2->whole[index]){
-					return 1;
-				}
-				else if(num2->whole[index] > num1->whole[index]){
-					return 0;
-				}
-				--index;
-			}
-			return num1->whole[index] > num2->whole[index];
-		}
+	BigInt *cp1 = copyBigInt(num1);
+	BigInt *cp2 = copyBigInt(num2);
+	BigInt *dif = difBigInts(cp1,cp2);
+	freeBigInt(cp1);
+	freeBigInt(cp2);
+	
+	if(((dif->whole[dif->wholeSize-1]) >> 7) == 1){
+		printf("Difference: ");
+		printBigInt(dif);
+		freeBigInt(dif);
+		return 0;
 	}
 	else{
-		if(signTwo == 0){
-			return 0;
+		for(int i = 0;i < dif->wholeSize;++i){
+			if(dif->whole[i] != 0) {
+				freeBigInt(dif);
+				return 1;
+			}	
 		}
-		//If we get here, both signs are negative.
-		else{
-			flipNegative(num1);
-			flipNegative(num2);
-			int result = greaterThanBigInt(num1,num2);
-			flipNegative(num1);
-			flipNegative(num2);
-			return 1 - result;
-		}
+		freeBigInt(dif);
+		return 0;
 	}
 }
