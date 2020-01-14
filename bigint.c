@@ -131,6 +131,24 @@ BigInt *productBigInts(BigInt *num1,BigInt *num2){
 	}
 	return new;
 }
+BigInt *powerBigInts(BigInt *b,BigInt *exp){
+	BigInt *product = copyBigInt(b);
+	BigInt *one = parseBigInt("1");
+	BigInt *tmp;
+	exp = copyBigInt(exp);
+	while(greaterThanBigInt(exp,one)){
+		tmp = product;
+		product = productBigInts(product,b);
+		freeBigInt(tmp);
+
+		tmp = exp;
+		exp = difBigInts(exp,one);
+		freeBigInt(tmp);
+	}
+	freeBigInt(one);
+	freeBigInt(exp);
+	return product;
+}
 
 //Parses a big integer from a given string. 
 BigInt *parseBigInt(char *str){
