@@ -77,9 +77,6 @@ BigInt *difBigInts(BigInt *num1,BigInt *num2){
 	return new;
 }
 BigInt *allocBigInt(int);
-BigInt *expBigInts(BigInt *num1,BigInt *num2){
-	
-}
 BigInt *productBigInts(BigInt *num1,BigInt *num2){
 	//Method variables. 
 	unsigned char signOne, signTwo; 
@@ -131,22 +128,39 @@ BigInt *productBigInts(BigInt *num1,BigInt *num2){
 	}
 	return new;
 }
+//Gotta rewrite this so that it is faster. 
 BigInt *powerBigInts(BigInt *b,BigInt *exp){
-	BigInt *product = copyBigInt(b);
 	BigInt *one = parseBigInt("1");
+	BigInt *zero = parseBigInt("0");
+	BigInt *product = copyBigInt(one);
 	BigInt *tmp;
+	int steps = 0;
 	exp = copyBigInt(exp);
-	while(greaterThanBigInt(exp,one)){
-		tmp = product;
-		product = productBigInts(product,b);
-		freeBigInt(tmp);
+	b = copyBigInt(b);
+	while(greaterThanBigInt(exp,zero)){
+		++steps;
+		if(exp->whole[0] & 1 == 1){
+			tmp = product;
+			product = productBigInts(product,b);
+			freeBigInt(tmp);
 
-		tmp = exp;
-		exp = difBigInts(exp,one);
-		freeBigInt(tmp);
+			tmp = exp;
+			exp = difBigInts(exp,one);
+			freeBigInt(tmp);
+		}
+		else{
+			tmp = b;
+			b = productBigInts(b,b);
+			freeBigInt(tmp);
+
+			divBigInt2(exp);
+		}
 	}
+	//printf("Steps: %d\n",steps);
 	freeBigInt(one);
 	freeBigInt(exp);
+	freeBigInt(b);
+	freeBigInt(zero);
 	return product;
 }
 
@@ -231,6 +245,16 @@ void flipNegative(BigInt *num){
 		num->whole[index] = sum % 256;
 		carry = sum / 256; 
 		++index;
+	}
+}
+//Divides the bigint by 2.
+void divBigInt2(BigInt *num){
+	int index, carry, sum;
+	carry = 0;
+	for(index = num->wholeSize - 1;index >= 0;--index){
+		sum = carry * 256 + num->whole[index];
+		carry = sum & 1;
+		num->whole[index] = sum >> 1;
 	}
 }
 //Divides the bigint by 10. 

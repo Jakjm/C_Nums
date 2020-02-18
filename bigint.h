@@ -8,6 +8,7 @@ char *bigIntToStr(BigInt *);
 void printBigIntHex(BigInt *);
 int checkBigInt(char *);
 void printSpecs(BigInt *num);
+void divBigInt2(BigInt *num);
 void freeBigInt(BigInt *);
 //Function for calculating the sum of two bigints.
 BigInt *sumBigInts(BigInt *,BigInt *);
