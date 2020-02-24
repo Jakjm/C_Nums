@@ -139,7 +139,7 @@ BigInt *powerBigInts(BigInt *b,BigInt *exp){
 	b = copyBigInt(b);
 	while(greaterThanBigInt(exp,zero)){
 		++steps;
-		if(exp->whole[0] & 1 == 1){
+		if((exp->whole[0] & 1) == 1){
 			tmp = product;
 			product = productBigInts(product,b);
 			freeBigInt(tmp);
