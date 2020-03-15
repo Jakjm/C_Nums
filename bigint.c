@@ -38,6 +38,75 @@ int checkBigInt(char *str){
 char *processNumber(char *);
 void flipNegative(BigInt *);
 void mulBigInt10(BigInt *);
+/*
+ *Calculates the quotient of two big integers.
+ *@param num1 the dividend
+ *@param num2 the divisor.
+ *@return the quotient of num1 divided by num2.
+ */
+BigInt *quotientBigInts(BigInt *num1,BigInt *num2){
+	int signOne = num1->whole[num1->wholeSize-1] >> 7;
+	int signTwo = num2->whole[num2->wholeSize-1] >> 7;
+	BigInt *quotient, *product, *middle, *tmp;
+	BigInt *zero, *one, *low, *high;
+	BigInt *difference;
+	if(signOne){
+		num1 = copyBigInt(num1);
+		flipNegative(num1);
+	}
+	if(signTwo){
+		num2 = copyBigInt(num2);
+		flipNegative(num2);
+	}
+	
+	/**Getting the low and high range..*/
+	zero = parseBigInt("0");
+	one = parseBigInt("1");
+	low = copyBigInt(zero);
+	high = copyBigInt(num1);
+	difference = difBigInts(high,low);
+	while(greaterThanBigInt(difference,one)){
+		/*Calculating the middle value*/
+		tmp = copyBigInt(difference);
+		divBigInt2(tmp);
+		middle = sumBigInts(tmp,low);
+		freeBigInt(tmp);
+
+		product = productBigInts(middle,num2);
+		if(greaterThanBigInt(product,num1)){
+			tmp = high;
+			high = difBigInts(high,middle);
+			freeBigInt(tmp);
+		}
+		else{
+			tmp = low;
+			low = sumBigInts(low,middle);
+			freeBigInt(tmp);
+		}
+		freeBigInt(middle);
+		
+
+		/*Calculating the difference between high and low again.*/
+		freeBigInt(difference);
+		difference = difBigInts(high,low);
+	}
+	quotient = low;
+	/*Freeing the one and zero values that aren't used anymore.*/
+	freeBigInt(one);
+	freeBigInt(zero);
+	/*Freeing the high range used to do our calculations. */
+	freeBigInt(high);
+	if(signOne ^ signTwo){
+		flipNegative(quotient);
+	}
+	if(signOne){
+		freeBigInt(num1);
+	}
+	if(signTwo){
+		freeBigInt(num2);
+	}
+	return quotient;
+}
 BigInt *sumBigInts(BigInt *num1,BigInt *num2){
 	BigInt *larger, *smaller, *newNum;
 	int sum, carry, index, sign;
@@ -421,8 +490,6 @@ int greaterThanBigInt(BigInt *num1,BigInt *num2){
 	freeBigInt(cp2);
 	
 	if(((dif->whole[dif->wholeSize-1]) >> 7) == 1){
-		printf("Difference: ");
-		printBigInt(dif);
 		freeBigInt(dif);
 		return 0;
 	}

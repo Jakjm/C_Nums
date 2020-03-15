@@ -18,6 +18,8 @@ BigInt *difBigInts(BigInt *,BigInt *);
 BigInt *productBigInts(BigInt *,BigInt *);
 //Function for calculating the value of the first bigint raised to the second. 
 BigInt *powerBigInts(BigInt *,BigInt *);
+//Function for calculating the quotient of two big integers...
+BigInt *quotientBigInts(BigInt *,BigInt *);
 BigInt *copyBigInt(BigInt *);
 
 int lessThanBigInt(BigInt *,BigInt *);
