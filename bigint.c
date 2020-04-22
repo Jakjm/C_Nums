@@ -91,31 +91,39 @@ BigInt *quotientBigInts(BigInt *num1,BigInt *num2){
 				break;
 			}
 			else{ /*Otherwise, we know that middle is too big.*/
+				
+				/*Subtract one from the middle.*/
 				tmp = middle;
 				middle = difBigInts(middle,one);
 				freeBigInt(tmp);
-				tmp = high;
+				
+				/*Set high to the middle.*/
+				freeBigInt(high);
 				high = middle;
-				freeBigInt(tmp);
+				
+				/*Make quotient equal to high.*/
 				quotient = high;
 			}
 		}
 		/*Otherwise, we need to make our low value bigger!*/
 		else{
-			tmp = low;
+			/*Set low to middle.*/
+			freeBigInt(low);
 			low = middle;
-			freeBigInt(tmp);
+			/*Quotient becomes equal to low.*/
 			quotient = low;
 		}
 	}
-	
+	/*Get rid of high if quotient is equal to low or null.*/
 	if(quotient == low || quotient == NULL){
 		quotient = low;
 		freeBigInt(high);
 	}
+	/*Get rid of low if quotient is low.*/
 	else if(quotient == high){
 		freeBigInt(low);
 	}
+	/*Otherwise, get rid of both, as quotient is equal to middle.*/
 	else{
 		freeBigInt(high);
 		freeBigInt(low);
@@ -124,10 +132,11 @@ BigInt *quotientBigInts(BigInt *num1,BigInt *num2){
 	/*Freeing the one and zero values that aren't used anymore.*/
 	freeBigInt(one);
 	freeBigInt(zero);
-	/*Freeing the high range used to do our calculations. */
+	/*Flip the quotient to negative if only one of the signs was zero*/
 	if(signOne ^ signTwo){
 		flipNegative(quotient);
 	}
+	/*Free any copies of num1 and num2 if they were copied to flip negative.*/
 	if(signOne){
 		freeBigInt(num1);
 	}

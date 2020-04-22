@@ -3,18 +3,18 @@
 #include <time.h>
 #include "bigint.h"
 int main(int argc, char **argv){
-	int i, b;
+	int b;
 	char *s = malloc(sizeof(char) * 50);
 	BigInt *c, *a,*z = parseBigInt("20");
-	for(i = 1;i < 21;++i){
-		for(b = 0;b < 20;++b){
-			sprintf(s,"%d",i);
-			a = parseBigInt(s);
-			c = quotientBigInts(z,a);
-			printf("20 divided by %d = ",i);
-			printBigInt(c);
-			freeBigInt(a);
-		}
+	for(b = 0;b < 22;++b){
+		sprintf(s,"%d",b);
+		a = parseBigInt(s);
+		c = quotientBigInts(z,a);
+		printf("20 divided by %d = ",b);
+		printBigInt(c);
+		freeBigInt(a);
 	}
+	printf("0 divided by 0: ");
+	printBigInt(quotientBigInts(parseBigInt("0"),parseBigInt("0")));
 	return 0;
 }
