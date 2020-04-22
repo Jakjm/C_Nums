@@ -58,44 +58,73 @@ BigInt *quotientBigInts(BigInt *num1,BigInt *num2){
 		num2 = copyBigInt(num2);
 		flipNegative(num2);
 	}
-	
+	quotient = NULL;
 	/**Getting the low and high range..*/
 	zero = parseBigInt("0");
 	one = parseBigInt("1");
 	low = copyBigInt(zero);
 	high = copyBigInt(num1);
-	difference = difBigInts(high,low);
-	while(greaterThanBigInt(difference,one)){
-		/*Calculating the middle value*/
-		tmp = copyBigInt(difference);
-		divBigInt2(tmp);
-		middle = sumBigInts(tmp,low);
-		freeBigInt(tmp);
 
-		product = productBigInts(middle,num2);
-		if(greaterThanBigInt(product,num1)){
-			tmp = high;
-			high = difBigInts(high,middle);
-			freeBigInt(tmp);
+	/*While our search space contains multiple values...*/
+	while(greaterThanBigInt(high,low)){
+		/*Calculating the middle value*/
+		difference = difBigInts(high,low);
+		divBigInt2(difference);
+		/*If the difference is less than two, make the middle equal to low.*/
+		if(greaterThanEqualBigInt(zero,difference)){
+			middle = sumBigInts(low,one);
 		}
 		else{
-			tmp = low;
-			low = sumBigInts(low,middle);
-			freeBigInt(tmp);
+			middle = sumBigInts(low,difference);
 		}
-		freeBigInt(middle);
-		
-
-		/*Calculating the difference between high and low again.*/
 		freeBigInt(difference);
-		difference = difBigInts(high,low);
+
+		/*Check the product of middle * num2*/
+		product = productBigInts(middle,num2);
+		
+		/*If the product of the middle and num2 is greater than num1, we need to make our high value smaller.*/
+		if(greaterThanEqualBigInt(product,num1)){
+
+			/*Middle is exactly the quotient if num1 = product.*/
+			if(greaterThanEqualBigInt(num1,product)){
+				quotient = middle;
+				break;
+			}
+			else{ /*Otherwise, we know that middle is too big.*/
+				tmp = middle;
+				middle = difBigInts(middle,one);
+				freeBigInt(tmp);
+				tmp = high;
+				high = middle;
+				freeBigInt(tmp);
+				quotient = high;
+			}
+		}
+		/*Otherwise, we need to make our low value bigger!*/
+		else{
+			tmp = low;
+			low = middle;
+			freeBigInt(tmp);
+			quotient = low;
+		}
 	}
-	quotient = low;
+	
+	if(quotient == low || quotient == NULL){
+		quotient = low;
+		freeBigInt(high);
+	}
+	else if(quotient == high){
+		freeBigInt(low);
+	}
+	else{
+		freeBigInt(high);
+		freeBigInt(low);
+	}
+
 	/*Freeing the one and zero values that aren't used anymore.*/
 	freeBigInt(one);
 	freeBigInt(zero);
 	/*Freeing the high range used to do our calculations. */
-	freeBigInt(high);
 	if(signOne ^ signTwo){
 		flipNegative(quotient);
 	}
@@ -462,33 +491,37 @@ void printBigInt(BigInt *num){
 	printf("%s\n",str);
 	free(str);
 }
-//Reverses a string
+//Reverses a string, without knowing its length.*/
 void reverseStr(char *str){
-	int start = 0;
-	int end = 0;
-	int nul;
 	char temp;
-	while(str[end] != '\0'){
+	char *end;
+	end = str;
+	while(*end != '\0'){
 		++end;
 	}
-	nul = end;
 	--end;
-	while(start < nul && end > 0 && start < end){
-		temp = str[start];
-		str[start] = str[end];
-		str[end] = temp;
-		++start;
+	/*Reverse every character from str to end.*/
+	while(str < end){
+		temp = *end;
+		*end = *str;
+		*str = temp;
+		++str;
 		--end;
 	}
 
 }
+/*Function used to determine if one big int is greater than or equal to another.*/
+int greaterThanEqualBigInt(BigInt *num1,BigInt *num2){
+	/*Take the difference of num1 and num2*/
+	BigInt *dif = difBigInts(num1,num2);
+	/*Take one minus the sign of the difference. Result = 1 if the sign is positive, and 0 if the sign is negative.*/
+	int result = 1 - (dif->whole[dif->wholeSize-1] >> 7);
+	freeBigInt(dif);
+	return result;
+}
+/*Function used to determine if one big int is greater than another.*/
 int greaterThanBigInt(BigInt *num1,BigInt *num2){
-	BigInt *cp1 = copyBigInt(num1);
-	BigInt *cp2 = copyBigInt(num2);
-	BigInt *dif = difBigInts(cp1,cp2);
-	freeBigInt(cp1);
-	freeBigInt(cp2);
-	
+	BigInt *dif = difBigInts(num1,num2);
 	if(((dif->whole[dif->wholeSize-1]) >> 7) == 1){
 		freeBigInt(dif);
 		return 0;

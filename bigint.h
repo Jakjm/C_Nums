@@ -23,5 +23,7 @@ BigInt *quotientBigInts(BigInt *,BigInt *);
 BigInt *copyBigInt(BigInt *);
 
 int lessThanBigInt(BigInt *,BigInt *);
+/*Definitions for checking inequalities.*/
+int greaterThanEqualBigInt(BigInt *,BigInt *);
 int greaterThanBigInt(BigInt *,BigInt *);
 int equalTo(BigInt *,BigInt*);
